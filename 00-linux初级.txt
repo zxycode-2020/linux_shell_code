@@ -1,0 +1,144 @@
+1、磁盘挂载
+	磁盘的使用流程：磁盘=>分区=>格式化=>挂载
+	mount：查看所有挂载情况
+	mount [-t 文件系统] 磁盘分区 挂载点
+	umount 磁盘分区/挂载点
+	/etc/fatab：开机挂载内容写在次文件中，一行表示一个
+2、磁盘查看
+	df：查看磁盘分区使用情况，-h人性化的显示
+	du：查看指定目录的使用情况，-h人性化的显示
+3、管道(|)
+	说明：就是将前一个命令的输出作为后一个命令的输入，使用管道符'|'进行连接
+	实例：
+		ls -l /etc | more
+		ls /etc | grep '^vi'
+	注意：有些命令不接受管道参数，可以结合xargs使用
+		find -type d | xargs rm -r
+4、重定向
+	打开任意程序，系统会自动创建三个文件流：标准输入(0)、标准输出(1)、标准错误(2)
+	而且这三个文件流都被指定到了终端
+	输出重定向：
+		ls /etc > 1.txt				#将ls输出的内容保存到1.txt中
+		echo 'hello' >> 1.txt		#将hello字符串追加到1.txt中
+	错误重定向：
+		ls /abc	2>2.txt				#将错误输出保存到2.txt中
+	同时重定向输出和错误：
+		ls /abc . &>3.txt			#将输出和错误同时保存到3.txt中
+5、系统服务
+	网络：
+		ping：检查网络连通性
+		ifconfig：查看网卡信息
+		ifup：启动网卡
+		ifdown：关闭网卡
+		service network start|stop|restart	启动|关闭|重启 网络服务
+		网卡配置文件：/etc/sysconfig/network-scripts/ifcfg-eth0
+	端口查看：
+		netstat -tunpl
+	内存查看：
+		free：查看内容，-h人性化的显示
+	正在做什么
+		w：what的简写，查看系统正在做什么
+	查看所有执行程序
+		top：是w的详细显示，3秒刷新一次
+	查看虚拟内存：
+		vmstat
+	进程管理：
+		查看进程：ps aux  a:所有；u:显示用户；x:显示没有终端的
+		杀死进程：kill -9 PID	杀死指定进程号的进程
+6、压缩解压
+	zip/unzip： yum install -y zip unzip
+		实例：
+		zip 123.zip *.txt		#将所有的txt文件压缩为123.zip
+		unzip 123.zip			#将压缩文件123.zip解压
+	gzip/gunzip：只能压缩单个文件，压缩后会删除原文件，后缀为.gz
+		实例：
+		gzip 1.txt				#将1.txt压缩成1.txt.gz
+		gunzip 1.txt.gz			#将压缩文件1.txt.gz解压
+		gzip -d 1.txt.gz		#功能同gunzip
+	bzip2/bunzip2：用法同上，后缀是bz2
+		实例：
+		bzip2 1.txt				#将1.txt文件压缩
+		bunzip2 1.txt.bz2		#将压缩文件1.txt.bz2解压
+		bzip2 -d 1.txt.bz2		#将压缩文件1.txt.bz2解压
+		说明：-k参数可以在操作后保留原文件
+	tar：打包解包工具，后缀为tar
+		-c：打包
+		-x：拆包
+		-t：查看
+		说明：以上三个参数不能一起使用
+		-f：指定文件，一般放在最后
+		-v：显示详细信息
+		-z：使用gzip/gunzip进行压缩解压
+		-j：使用bzip2/bunzip2进行压缩解压
+		
+		实例：
+		tar -cvf 123.tar *.txt	#将所有的txt文件打包成123.tar
+		tar -tf 123.tar			#查看打包文件123.tar中的内容
+		tar -xvf 123.tar		#将打包的文件123.tar解包
+		tar -zcvf 123.tar.gz 123.tar	#使用gzip压缩文件123.tar
+		tar -zxvf 123.tar.gz	#使用gunzip将123.tar.gz解压
+		tar -jcvf 123.tar.bz2 123.tar	使用bzip2压缩文件
+		tar -jxvf 123.tar.bz2 	#使用bunzip2进行解压
+		tar -zcvf 123.tar.gz *.txt	#将所有的txt文件打包并使用gzip压缩
+		* tar -zxvf 123.tar.gz	#使用gunzip解压
+		tar -jcvf 123.tar.bz2 *.txt	#将所有的txt文件打包并使用bzip2压缩
+		* tar -jxvf 123.tar.bz2	#使用bunzip2解压
+	
+		说明：tar.gz简写为tgz，tar.bz2简写为tbz2/tbz
+7、软件安装方式
+	1、源码安装：需要对应的编译工具(gcc、gc++)
+		说明：需要提前下载好对应的压缩包
+		配置：configure
+		编译：make
+		安装：make install
+		实例演示：安装apache
+		1、下载
+		2、解压：tar -jxvf httpd-2.2.34.tar.bz2
+		3、进入：cd httpd-2.2.34
+		4、配置：./configure --prefix=/usr/local/apache2
+		5、编译：make
+		6、安装：make install
+		7、修改配置文件：PREFIX/conf/httpd.conf
+			ServerName IP:80 或 ServerName www.test.com:80
+			若使用域名，需要本地劫持(本地域名解析)，具体做法如下：
+			在文件 C:\Windows\System32\drivers\etc\hosts 最后添加一行
+			服务器的IP www.test.com
+		8、服务器控制
+			./PREFIX/bin/apachectl start|stop|resatrt	开启|关闭|重启
+		9、测试，在浏览器中输入IP或域名	
+	2、rpm安装
+		rpm：是RPM Pakage Manager的缩写，也是软件包的后缀，也是命令
+		命令参数：
+			-i：安装
+			-e：卸载
+			-v：显示详细信息
+			-h：显示安装进度
+			-U：升级
+			-q：查询
+		实例演示：安装vim
+			rpm -ivh vim-filesystem-7.4.629-5.el6_8.1.x86_64.rpm
+			rpm -ivh vim-common-7.4.629-5.el6_8.1.x86_64.rpm
+			rpm -ivh vim-enhanced-7.4.629-5.el6_8.1.x86_64.rpm	
+
+		使用yum只下载rpm包：yum install -y vim --downloadonly --downloaddir .
+	3、yum安装
+		说明：yum是最简单的安装软件方式，不用考虑复杂的包依赖关系
+		命令：
+			清空缓存：yum clean all
+			生成缓存：yum makecache
+			安装软件：install
+			卸载软件：remove
+			更新软件：update
+			搜索软件：search
+			列表显示：list
+		更改yum源：
+			cd /etc/yum.repos.d/
+			cp CentOS-Base.repo CentOS-Base.repo.bak
+			下载指定的yum源配置文件
+			清空原来的缓存：yum clean all
+			重新生成缓存：yum makecache
+
+其它：
+	cmd1;cmd2;cmd3	顺序执行cmd1、cmd2、cmd3
+	cmd1 || cmd2	cmd1执行成功，cmd2就不执行了
+	cmd1 && cmd2	cmd1执行成功，cmd2才执行

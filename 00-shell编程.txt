@@ -1,0 +1,99 @@
+1、continue
+	作用：结束本次循环，进入下次循环
+	实例：打印1到10之间不能被3整除的数
+		i=1
+		while [ $i -le 10 ]
+		do
+			if [ $[$i%3] -eq 0 ];then
+				((i++))
+				continue
+			fi
+			echo $i
+			((i++))
+		done
+2、函数
+	简单：
+	demo()
+	{
+		echo "hello world"
+	}
+	demo
+	参数：
+	test()
+	{
+		echo $1
+		echo $2
+	}
+	test 123 abc
+	返回值：
+	add()
+	{
+		return 123
+	}
+	add
+	echo $?
+3、逻辑运算实例
+	if [ 2 -lt 3 -a 3 -lt 5 ];then
+        echo "ok"
+	fi
+	if [ 2 -lt 3 ] && [ 3 -lt 5 ];then
+			echo "ok"
+	fi
+
+	if [ 2 -gt 3 -o 3 -lt 5 ];then
+			echo "ok"
+	fi
+	if [ 2 -gt 3 ] || [ 3 -lt 5 ];then
+			echo "ok"
+	fi
+
+	if [ ! 2 -gt 3 ];then
+			echo "xxx"
+	fi
+4、	黑洞文件/dev/null
+	说明：改文件无论怎么写入都是空的，什么时候读取也都是空
+	作用：将任意内容写入以屏蔽错误，清除文件内容(如：犯罪记录)
+	实例：cat /dev/null > xx.log
+5、printf	
+	作用：格式化的输出字符串
+	实例：printf "hello %d %s\n" 250  "world"
+	结果：hello 250 world
+6、sed
+	作用：处理文件流
+	格式：sed [参数] 指令 文件
+	参数：
+		-n：结合命令p使用，用于打印内容
+		-i：默认不加改参数不会修改文件内容，加上后会真的修改文件
+	命令：
+		p：打印，需要结合-n一起使用
+		a：增加
+		d：删除
+		c：取代
+		s：替换
+		
+	实例：
+		sed -n '1p' 1.txt		#打印第1行
+		sed -n '1,3p' 1.txt		#打印1-3行
+		sed -n '$p' 1.txt		#打印最后一行
+		sed -n '3,,$p' 1.txt	#
+		
+		sed '1a xxx' 1.txt		#在第1行的下面添加xxx
+		sed '1,3a xxx' 1.txt	#在1-3行的下面都添加xxx
+		
+		sed '5d' 1.txt 			#删除第5行的内容
+		sed '3,5d' 1.txt 		#删除3-5行的内容
+		
+		sed '3c xxx' 1.txt		#使用xxx取代第3行的内容
+		sed '3,5c xxx' 1.txt	#使用xxx取代3-5行的整个内容
+		
+		sed 's/jn/xxx/g' 1.txt 		#将所有的jn替换成xxx
+		sed '5,7s/jn/xxx/g' 1.txt 	#将5-7行的jn替换成xxx
+7、gawk，功能更强大，稍微复杂一点
+
+作业：
+	history > his.txt
+	将文件his.txt处理一下，只保留最后几行
+	tail -5 his.txt > his.tmp
+	mv his.tmp his.txt
+	#cat /dev/null > his.txt
+	
